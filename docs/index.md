@@ -7,7 +7,7 @@ description: |-
 
 # LDAP Provider
 
-The LDAP provider provides resources to interact with a LDAP object.
+The LDAP provider provides resources to interact with a LDAP object, includes the ability to update attributes that cannot be read by the client.
 
 ## Example Usage
 

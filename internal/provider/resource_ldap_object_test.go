@@ -126,5 +126,6 @@ resource "ldap_object" "jdoe" {
    	{ homeDirectory = "/home/jdoe"},
    	{ loginShell    = "/bin/bash" }
 	]
+
 }
 `

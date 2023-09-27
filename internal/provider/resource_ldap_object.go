@@ -57,6 +57,13 @@ func resourceLDAPObject() *schema.Resource {
 				},
 				Optional: true,
 			},
+      "hidden_attributes": {
+				Type:        schema.TypeSet,
+				Description: "An optional list of attributes that, for permission reasons, cannot be read from the ldap server." +
+                     "Attributes present in this list will be updated using the replace method, even if the attribute does not exists in the ldap server.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+      },
 		},
 
 		Description: "Provides a LDAP Object.",
@@ -240,7 +247,8 @@ func resourceLDAPObjectUpdate(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] ldap_object::update - \n%s", printAttributes("old attributes map", o))
 		log.Printf("[DEBUG] ldap_object::update - \n%s", printAttributes("new attributes map", n))
 
-		added, changed, removed := computeDeltas(o.(*schema.Set), n.(*schema.Set))
+		added, changed, removed := computeDeltas(o.(*schema.Set), n.(*schema.Set), d.Get("hidden_attributes").(*schema.Set))
+
 		if len(added) > 0 {
 			log.Printf("[DEBUG] ldap_object::update - %d attributes added", len(added))
 			for _, attr := range added {
@@ -409,7 +417,7 @@ func printAttributes(prefix string, attributes interface{}) string {
 	return buffer.String()
 }
 
-func computeDeltas(os, ns *schema.Set) (added, changed, removed []ldap.PartialAttribute) {
+func computeDeltas(os, ns, hidden_attrs *schema.Set) (added, changed, removed []ldap.PartialAttribute) {
 
 	rk := set.New() // names of removed attributes
 	for _, v := range os.Difference(ns).List() {
@@ -452,7 +460,7 @@ func computeDeltas(os, ns *schema.Set) (added, changed, removed []ldap.PartialAt
 	}
 
 	for _, k := range ak.List() {
-		if !rk.Contains(k) && !kk.Contains(k) {
+		if !rk.Contains(k) && !kk.Contains(k) && !hidden_attrs.Contains(k) {
 			// this is the first value under this name: no value is being
 			// removed and no value is being kept; so we're adding this new
 			// attribute to the LDAP object (AddedAttributes), getting all

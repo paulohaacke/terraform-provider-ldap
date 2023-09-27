@@ -34,6 +34,7 @@ resource "ldap_object" "a123456" {
     { homeDirectory = "/home/jdoe" },
     { loginShell = "/bin/bash" }
   ]
+  hidden_attributes = ["userPassword"]
 }
 ```
 
@@ -48,6 +49,7 @@ resource "ldap_object" "a123456" {
 ### Optional
 
 - **attributes** (Set of Map of String) The map of attributes of this object; each attribute can be multi-valued.
+- **hidden_attributes** (Set of String) The set of attributes that can't be read from the LDAP server (e.g. userPassword). Attributes present in this list will be updated using the replace method, even if the attribute does not exists in the ldap server.
 - **id** (String) The ID of this resource.
 
 ## Import

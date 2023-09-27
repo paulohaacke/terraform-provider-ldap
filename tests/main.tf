@@ -55,4 +55,6 @@ resource "ldap_object" "a123456" {
     { homeDirectory = "/home/jdoe" },
     { loginShell = "/bin/bash" }
   ]
+
+  hidden_attributes = ["userPassword"]
 }
